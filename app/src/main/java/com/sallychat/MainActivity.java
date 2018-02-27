@@ -2,23 +2,28 @@ package com.sallychat;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sallychat.database.schemas.ChatEntity;
+import com.sallychat.database.services.ChatModelService;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView txtSpeechInput;
     private ImageButton btnSpeak;
     private final int REQ_CODE_SPEECH_INPUT = 100;
     TTSManager ttsManager = null;
+    RecyclerView chatRcv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
         ttsManager = new TTSManager();
         ttsManager.init(this);
-        txtSpeechInput = (TextView) findViewById(R.id.txtSpeechInput);
-        btnSpeak = (ImageButton) findViewById(R.id.btnSpeak);
-
+        btnSpeak = findViewById(R.id.btnSpeak);
+        chatRcv = findViewById(R.id.chat_rcv);
 
 
         btnSpeak.setOnClickListener(new View.OnClickListener() {
@@ -73,10 +77,13 @@ public class MainActivity extends AppCompatActivity {
             case REQ_CODE_SPEECH_INPUT: {
                 if (resultCode == RESULT_OK && null != data) {
 
-                    ArrayList<String> result = data
-                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    txtSpeechInput.setText(result.get(0));
-                    ttsManager.initQueue(result.get(0));
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    if (result != null) {
+                        ChatModelService.getInstance().saveChat(result.get(0), "user");
+                        ttsManager.initQueue(result.get(0));
+
+                        setAdapter();
+                    }
                 }
                 break;
             }
@@ -84,7 +91,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    private void setAdapter() {
+        List<ChatEntity> chatList = ChatModelService.getInstance().getChatList();
+        StaggeredGridLayoutManager gaggeredGridLayoutManager = new StaggeredGridLayoutManager(1, 1);
+        chatRcv.setLayoutManager(gaggeredGridLayoutManager);
+        ChatListAdapter chatListAdapter = new ChatListAdapter(this, chatList);
+        chatRcv.setAdapter(chatListAdapter);
+    }
 
 
     /**
