@@ -11,9 +11,17 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.sallychat.api.dto.res.ChatRes;
+import com.sallychat.api.services.GetChatResponseAPiService;
 import com.sallychat.database.schemas.ChatEntity;
 import com.sallychat.database.services.ChatModelService;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -36,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         btnSpeak = findViewById(R.id.btnSpeak);
         chatRcv = findViewById(R.id.chat_rcv);
 
-setAdapter();
+        setAdapter();
         btnSpeak.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -81,8 +89,11 @@ setAdapter();
                     if (result != null) {
                         ChatModelService.getInstance().saveChat(result.get(0), "user");
                         ttsManager.initQueue(result.get(0));
-
-                        setAdapter();
+                        try {
+                            GetChatResponseAPiService.getInstance().getChatResponse(result.get(0), callback());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 break;
@@ -91,11 +102,39 @@ setAdapter();
         }
     }
 
+    private Callback callback() {
+        return new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                if (response.code() == 200) {
+                    ChatRes chatRes = new Gson().fromJson(response.body().string(), new TypeToken<ChatRes>() {
+                    }.getType());
+                    ArrayList<String> textArray = chatRes.getResponse().getOutput().getText();
+                    String text = textArray.get(0);
+                    ChatModelService.getInstance().saveChat(text, "system");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setAdapter();
+
+                        }
+                    });
+
+                }
+            }
+        };
+    }
+
     private void setAdapter() {
         List<ChatEntity> chatList = ChatModelService.getInstance().getChatList();
         StaggeredGridLayoutManager gaggeredGridLayoutManager = new StaggeredGridLayoutManager(1, 1);
         chatRcv.setLayoutManager(gaggeredGridLayoutManager);
-        if (chatList!=null && chatList.size()>0) {
+        if (chatList != null && chatList.size() > 0) {
             ChatListAdapter chatListAdapter = new ChatListAdapter(this, chatList);
             chatRcv.setAdapter(chatListAdapter);
         }

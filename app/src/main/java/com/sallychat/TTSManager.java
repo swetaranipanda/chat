@@ -4,8 +4,6 @@ import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
-import com.sallychat.database.services.ChatModelService;
-
 import java.util.Locale;
 
 /**
@@ -56,7 +54,6 @@ public class TTSManager {
 
         if (isLoaded) {
             mTts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-            ChatModelService.getInstance().saveChat(text, "system");
         }
         else {
             Log.e("error", "TTS Not Initialized");
