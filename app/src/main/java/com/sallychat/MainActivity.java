@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         btnSpeak = findViewById(R.id.btnSpeak);
         chatRcv = findViewById(R.id.chat_rcv);
 
-
+setAdapter();
         btnSpeak.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -95,8 +95,10 @@ public class MainActivity extends AppCompatActivity {
         List<ChatEntity> chatList = ChatModelService.getInstance().getChatList();
         StaggeredGridLayoutManager gaggeredGridLayoutManager = new StaggeredGridLayoutManager(1, 1);
         chatRcv.setLayoutManager(gaggeredGridLayoutManager);
-        ChatListAdapter chatListAdapter = new ChatListAdapter(this, chatList);
-        chatRcv.setAdapter(chatListAdapter);
+        if (chatList!=null && chatList.size()>0) {
+            ChatListAdapter chatListAdapter = new ChatListAdapter(this, chatList);
+            chatRcv.setAdapter(chatListAdapter);
+        }
     }
 
 

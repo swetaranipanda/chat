@@ -32,7 +32,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListViewHolder> {
 
     @Override
     public void onBindViewHolder(ChatListViewHolder holder, int position) {
-        holder.getView().setTag(position);
         String type = chatList.get(position).getType();
         if (type.equalsIgnoreCase("user")) {
             holder.userTxt.setText(chatList.get(position).getChat());
@@ -40,10 +39,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListViewHolder> {
         } else {
             holder.systemTxt.setText(chatList.get(position).getChat());
         }
+        holder.getView().setTag(position);
+
     }
 
     @Override
     public int getItemCount() {
-        return 5;
+        return chatList.size();
     }
 }

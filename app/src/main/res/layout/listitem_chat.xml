@@ -12,14 +12,13 @@
         android:layout_alignParentLeft="true"
         android:textSize="14sp"
         android:textColor="@color/white"
-        android:text="user"/>
+       />
 
 
     <TextView
         android:id="@+id/systemtxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="system"
         android:textSize="14sp"
         android:textColor="@color/white"
         android:layout_alignParentRight="true"
