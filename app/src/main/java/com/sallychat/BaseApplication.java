@@ -7,9 +7,11 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.GsonBuilder;
 import com.sallychat.database.schemas.DBConfig;
 
+import io.fabric.sdk.android.Fabric;
 import java.util.Date;
 
 
@@ -25,6 +27,7 @@ public class BaseApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         BaseApplication.context = getApplicationContext();
         DBConfig.createDatabase(context);
         gsonBuilder();
