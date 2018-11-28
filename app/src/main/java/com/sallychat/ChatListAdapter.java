@@ -22,7 +22,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListViewHolder> {
         this.context = context;
         chatList = list;
     }
-
     @Override
     public ChatListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.listitem_chat, null);
@@ -35,12 +34,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListViewHolder> {
         String type = chatList.get(position).getType();
         if (type.equalsIgnoreCase("user")) {
             holder.userTxt.setText(chatList.get(position).getChat());
-
         } else {
             holder.systemTxt.setText(chatList.get(position).getChat());
         }
         holder.getView().setTag(position);
-
     }
 
     @Override
